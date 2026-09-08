@@ -15,15 +15,6 @@ while in_str != "0":
                 print("У тебя ошибка в выражении (лишний знак)! Напиши правильный вариант")
                 in_str = input("Введите выражение: ")
             else:
-                # in_str = in_str.replace('((','( (')
-                # in_str = in_str.replace('))', ') )')
-                # for c in '0123456789':
-                #     in_str = in_str.replace(f'({c}', f'( {c}') \
-                #         .replace(f'{c})', f'{c} )').replace(f' -{c}',f'&{c}')
-                # for c in '+*/-':
-                #     in_str = in_str.replace(c,f' {c} ')
-                # for c in '0123456789':
-                #     in_str = in_str.replace(f'&{c}', f'-{c}')
                 for c in '0123456789':
                     in_str = in_str.replace(f' -{c}', f'~{c}')
 
