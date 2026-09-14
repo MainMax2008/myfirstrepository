@@ -3,28 +3,53 @@ print("------------------------------------------")
 print("Правила: напиши 0, если хочешь закончить/отрицательные числа пиши с пробелом, например, \n '(45+9)* -5' ")
 print("Разрешены для написания цифры от 0 до 9, арифм. действия (+,-,*,/), скобки и пробелы")
 print("------------------------------------------")
-in_str = input("Введите выражение: ")
-while in_str != "0":
+
+while True:
+    in_str = input("Введите выражение: ")
+
+    if in_str.strip() == "0":
+        print("Конец")
+        break
+
+    if not in_str.strip():
+        print("Вы ничего не ввели! Напиши правильный вариант")
+        continue
+    z = False
     for c in in_str:
-        if c not in '0123456789()/*-+ ':
+        if c not in '0123456789()/*-+. ':
             print('Ой-ой-ой, у тебя запрещенный символ в выражении! Напиши правильный вариант')
-            in_str = input("Введите выражение: ")
+            z = True
             break
-        else:
-            if "++" in in_str or "--" in in_str or '**' in in_str or '//' in in_str:
-                print("У тебя ошибка в выражении (лишний знак)! Напиши правильный вариант")
-                in_str = input("Введите выражение: ")
-            else:
-                for c in '0123456789':
-                    in_str = in_str.replace(f' -{c}', f'~{c}')
+    if z:
+        continue
 
-                if in_str.startswith('-'):
-                    in_str = '~' + in_str[1:]
+    in_cstr = in_str.replace(' ', '')
+    if "++" in in_cstr or "--" in in_cstr or '**' in in_cstr or '//' in in_cstr or '+*' in in_cstr \
+            or '+-' in in_cstr or '+/' in in_cstr or '-+' in in_cstr or '-/' in in_cstr or \
+            '-*' in in_cstr or '/+' in in_cstr or '/-' in in_cstr or '/*' in in_cstr \
+            or '*+' in in_cstr or '*-' in in_cstr or '*/' in in_cstr:
+        print("У тебя ошибка в выражении (лишний знак)! Напиши правильный вариант")
+        continue
+    elif in_cstr=='()' or in_cstr in \
+            ['+','-','/','*','(',')']:
+        print("У тебя ошибка в выражении (лишь один знак или скобки)! Напиши правильный вариант")
+        continue
+    elif in_str.count('(') != in_str.count(')'):
+        print("У тебя ошибка в выражении (не хватает скобок)! Напиши правильный вариант")
+        continue
 
-                for c in '()+-*/':
-                    in_str = in_str.replace(c, f' {c} ')
+    for c in '0123456789':
+        in_str = in_str.replace(f' -{c}', f'~{c}')
 
-                in_str = in_str.replace('~ ', '-').replace('~', '-')
+    if in_str.startswith('-'):
+        in_str = '~' + in_str[1:]
+    for op in '(/*+-':
+        in_str = in_str.replace(op + '-', op + '~')
+
+    for c in '()+-*/':
+        in_str = in_str.replace(c, f' {c} ')
+
+    in_str = in_str.replace('~ ', '-').replace('~', '-')
     token_str = in_str.split()
     massive = []
     stack = []
@@ -54,29 +79,40 @@ while in_str != "0":
         for c in stack:
             massive.append(c)
         stack = []
-    f = 0
-    while len(massive)>1:
-        if f==1: break
-        for i in range(len(massive)):
-            if massive[i]=='+' and massive[i-1] not in '()+/*-'  and massive[i-2] not in '()+/*-':
-                massive = massive[:i-2] + [str(float(massive[i-2])+float(massive[i-1]))] + massive[i+1:]
+
+    str_eval = []
+    error = 0
+
+    for token in massive:
+        if token not in ['+', '-', '*', '/']:
+            try:
+                str_eval.append(float(token))
+            except ValueError:
+                print(f"Ошибка: некорректное число '{token}'.")
+                error = 1
                 break
-            elif massive[i]=='-' and massive[i-1] not in '()+/*-' and massive[i-2] not in '()+/*-':
-                massive = massive[:i-2] + [str(float(massive[i-2])-float(massive[i-1]))] + massive[i+1:]
+        else:
+            if len(str_eval) < 2:
+                print("У тебя ошибка в выражении (лишние знаки или не хватает чисел)! Напиши правильный вариант")
+                error = 1
                 break
-            elif massive[i]=='*' and massive[i-1] not in '()+/*-' and massive[i-2] not in '()+/*-':
-                massive = massive[:i-2] + [str(float(massive[i-2])*float(massive[i-1]))] + massive[i+1:]
-                break
-            elif massive[i]=='/':
-                if float(massive[i - 1]) == 0:
+            b = str_eval.pop()
+            a = str_eval.pop()
+            if token == '+':
+                str_eval.append(a + b)
+            elif token == '-':
+                str_eval.append(a - b)
+            elif token == '*':
+                str_eval.append(a * b)
+            elif token == '/':
+                if b == 0:
                     print('Где-то происходит деление на 0. Так делать нельзя! Исправь')
-                    f = 1
+                    error = 1
                     break
-                else:
-                    res = float(massive[i - 2]) / float(massive[i - 1])
-                    massive = massive[:i - 2] + [str(res)] + massive[i + 1:]
-                    break
-    if f==0:
-        print(f'Результат: {massive[0]}')
-    in_str = input("Введите выражение: ")
-print("Конец")
+                str_eval.append(a / b)
+
+    if not error:
+        if len(str_eval) == 1:
+            print(f'Результат: {str_eval[0]}')
+        elif len(str_eval) > 1:
+            print("У тебя ошибка в выражении (пропущены арифметические знаки)! Напиши правильный вариант")
