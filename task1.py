@@ -23,6 +23,14 @@ while True:
     if z:
         continue
 
+    for c in '0123456789':
+        in_str = in_str.replace(f' -{c}', f'~{c}')
+
+    if in_str.startswith('-'):
+        in_str = '~' + in_str[1:]
+    for op in '(/*+-':
+        in_str = in_str.replace(op + '-', op + '~')
+
     in_cstr = in_str.replace(' ', '')
     if "++" in in_cstr or "--" in in_cstr or '**' in in_cstr or '//' in in_cstr or '+*' in in_cstr \
             or '+-' in in_cstr or '+/' in in_cstr or '-+' in in_cstr or '-/' in in_cstr or \
@@ -38,14 +46,6 @@ while True:
         print("У тебя ошибка в выражении (не хватает скобок)! Напиши правильный вариант")
         continue
 
-    for c in '0123456789':
-        in_str = in_str.replace(f' -{c}', f'~{c}')
-
-    if in_str.startswith('-'):
-        in_str = '~' + in_str[1:]
-    for op in '(/*+-':
-        in_str = in_str.replace(op + '-', op + '~')
-
     for c in '()+-*/':
         in_str = in_str.replace(c, f' {c} ')
 
@@ -53,6 +53,7 @@ while True:
     token_str = in_str.split()
     massive = []
     stack = []
+    s_error = False
     for c in token_str:
         if c not in '()+/*-':
             massive.append(c)
@@ -70,15 +71,28 @@ while True:
             if c=='(':
                 stack.append(c)
             if c==')':
-                while stack[-1] != '(':
-                    massive.append(stack[-1])
-                    stack.pop()
+                while len(stack) > 0 and stack[-1] != '(':
+                    massive.append(stack.pop())
+                if len(stack) == 0:
+                    s_error = True
+                    break
                 stack.pop()
-    if len(stack)!=0:
-        stack = stack[::-1]
-        for c in stack:
-            massive.append(c)
-        stack = []
+
+    if s_error:
+        print("У тебя ошибка в выражении (неверный порядок скобок)! Напиши правильный вариант")
+        continue
+
+    while len(stack) > 0:
+        op = stack.pop()
+        if op in '()':
+            s_error = True
+            break
+        massive.append(op)
+
+    if s_error or not massive:
+        print("У тебя ошибка в выражении (нет чисел или неверные скобки)! Напиши правильный вариант")
+        continue
+
 
     str_eval = []
     error = 0
