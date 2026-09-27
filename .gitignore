@@ -1,0 +1,55 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# ===== Java / Kotlin / Gradle / Maven =====
+target/
+build/
+out/
+.gradle/
+*.class
+*.jar
+*.war
+!gradle/wrapper/gradle-wrapper.jar
+.mvn/wrapper/maven-wrapper.jar
+
+# ===== C# / .NET =====
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# ===== C / C++ =====
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.o
+*.obj
+*.out
+*.exe
+*.dSYM/
+
+# ===== IDE / редакторы =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Прочее =====
+*.log
+.env
