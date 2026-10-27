@@ -7,14 +7,14 @@ class Ship:
     start_col: int
     size: int
     is_horizontal: bool
-    hits: set[tuple[int, int]] = field(default_factory=set)
+    hits: set[tuple[int, int]] = field(default_factory=set) # Безопасное создание пустого множества для каждого нового корабля
 
     @property
     def coordinates(self):
         """Возвращает список координат всех палуб корабля (row, col)."""
         coords = []
         for i in range(self.size):
-            if self.is_horizontal:
+            if self.is_horizontal: # Если корабль горизонтальный - увеличиваем столбец, если вертикальный - строку
                 coords.append((self.start_row, self.start_col+i))
             else:
                 coords.append((self.start_row+i, self.start_col))

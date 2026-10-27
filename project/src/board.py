@@ -3,10 +3,10 @@ from src.ship import Ship
 
 class Board:
     """Игровое поле 10x10 для одного игрока."""
-    SIZE = 10
+    SIZE = 10 # Размер доски - константа
 
     def __init__(self):
-        self.ships: list[Ship] = []
+        self.ships: list[Ship] = [] # Указание для IDE, какой тип данных будет лежать в списке
         self.hits = set()
         self.misses = set()
 
@@ -36,7 +36,7 @@ class Board:
                 for dc in (-1, 0, 1):
                     nr, nc = r + dr, c + dc
                     existing_ship = self.get_ship_at(nr, nc)
-                    if existing_ship is not None and existing_ship is not ship:
+                    if existing_ship is not None and existing_ship is not ship: # # Условие истинно, если клетка занята ЧУЖИМ кораблём (палубы этого же корабля игнорируются)
                         return False
         return True
 
@@ -49,7 +49,7 @@ class Board:
 
     def _mark_halo(self, ship):
         """Обводит потопленный корабль ореолом из промахов."""
-        for r,c in ship.coordinates:
+        for r,c in ship.coordinates: # Для каждой палубы потопленного корабля обходим квадрат 3 х 3
             for dr in (-1, 0, 1):
                 for dc in (-1, 0, 1):
                     nr, nc = r + dr, c + dc
@@ -57,7 +57,17 @@ class Board:
                         self.misses.add((nr,nc))
 
     def receive_shot(self, row, col):
-        """Обрабатывает выстрел по клетке, наносит урон и возвращает результат атаки."""
+        """
+        Обрабатывает выстрел по указанной клетке и обновляет состояние игры.
+        Принимает координаты клетки (row, col). Если выстрел приводит к потоплению
+        корабля, автоматически размечает окрестность промахов вокруг него.
+        Возвращает:
+            "out_of_bounds" — координаты находятся за пределами поля;
+            "duplicate"     — в эту клетку уже производился выстрел ранее;
+            "miss"          — выстрел пришёлся в пустую воду;
+            "hit"           — ранение корабля (остались целые палубы);
+            "sunk"          — корабль полностью уничтожен.`
+        """
         if not self._in_bounds(row, col):
             return "out_of_bounds"
 
@@ -83,5 +93,3 @@ class Board:
         if not self.ships:
             return False
         return all(ship.is_sunk for ship in self.ships)
-
-    

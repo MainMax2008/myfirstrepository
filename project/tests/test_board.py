@@ -1,6 +1,7 @@
 import unittest
-from src.board import *
-from src.ship import *
+from src.board import Board
+from src.ship import Ship
+from src.ui import parse_coordinate
 
 
 class TestBoard(unittest.TestCase):
@@ -135,6 +136,40 @@ class TestShip(unittest.TestCase):
         self.ship.hit(0, 1)
         third_result = self.ship.is_sunk
         self.assertTrue(third_result)
+
+
+class TestParseCoordinate(unittest.TestCase):
+
+    def test_valid_coordinates(self):
+        """Проверяет корректное преобразование валидных координат разного регистра и границ поля."""
+        cases = [("A1", (0, 0)), ("a1", (0, 0)), ("J10", (9, 9)), ("j10", (9, 9)), ("e5", (4, 4)), ("B7", (6, 1)), ("C2", (1, 2)), ("A 5", (4, 0))]
+        for coord_str, expected in cases:
+            with self.subTest(coord=coord_str): # Изоляция каждого теста в итерации, если один тест провален, остальные продолжатся
+                self.assertEqual(parse_coordinate(coord_str), expected)
+
+    def test_invalid_letter_raises_error(self):
+        """Проверяет выброс ValueError при вводе недопустимой буквы строки."""
+        invalid_letters = ["K1", "Z5", "1A", "Б1"]
+        for item in invalid_letters:
+            with self.subTest(coord=item):
+                with self.assertRaises(ValueError): # Проверка выброса нужного исключения
+                    parse_coordinate(item)
+
+    def test_out_of_bounds_number_raises_error(self):
+        """Проверяет выброс ValueError при выходе числового индекса за пределы 1-10."""
+        invalid_numbers = ["A0", "A11", "J99", "C-1"]
+        for item in invalid_numbers:
+            with self.subTest(coord=item):
+                with self.assertRaises(ValueError):
+                    parse_coordinate(item)
+
+    def test_malformed_and_empty_input_raises_error(self):
+        """Проверяет реакцию парсера на пустые строки, пробелы и некорректную длину."""
+        malformed = ["", "   ", "A", "10", "A100", "hello"]
+        for item in malformed:
+            with self.subTest(coord=item):
+                with self.assertRaises(ValueError):
+                    parse_coordinate(item)
 
 
 if __name__ == "__main__":
